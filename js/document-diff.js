@@ -13,8 +13,6 @@
 
 /** Minimum paragraph length considered for diffing (filters blank lines/noise) */
 const MIN_PARAGRAPH_LENGTH = 15;
-/** Maximum LCS cells before switching to the bounded linear comparison path. */
-const MAX_LCS_CELLS = 1_000_000;
 
 /**
  * @typedef {Object} DiffChange
@@ -100,37 +98,8 @@ function mergeModifications(changes) {
     } else {
       merged.push(current);
     }
-
   }
   return merged;
-}
-
-/**
- * Compares paragraphs by position when an exact LCS would exceed the memory
- * budget. This keeps large-document comparisons responsive and still exposes
- * every changed paragraph as added, removed, or modified.
- * @param {string[]} a
- * @param {string[]} b
- * @returns {DiffChange[]}
- */
-function compareByPosition(a, b) {
-  const fallbackChanges = [];
-  const sharedLength = Math.min(a.length, b.length);
-
-  for (let index = 0; index < sharedLength; index++) {
-    if (a[index] === b[index]) {
-      fallbackChanges.push({ type: 'unchanged', oldText: a[index], newText: b[index] });
-    } else {
-      fallbackChanges.push({ type: 'modified', oldText: a[index], newText: b[index] });
-    }
-  }
-  for (let index = sharedLength; index < a.length; index++) {
-    fallbackChanges.push({ type: 'removed', oldText: a[index] });
-  }
-  for (let index = sharedLength; index < b.length; index++) {
-    fallbackChanges.push({ type: 'added', newText: b[index] });
-  }
-  return fallbackChanges;
 }
 
 /**
@@ -160,10 +129,6 @@ function areSimilar(a, b) {
 export function diffDocuments(originalText, revisedText) {
   const paragraphsA = splitIntoParagraphs(originalText);
   const paragraphsB = splitIntoParagraphs(revisedText);
-
-  if (paragraphsA.length * paragraphsB.length > MAX_LCS_CELLS) {
-    return compareByPosition(paragraphsA, paragraphsB);
-  }
 
   const lcsTable = computeLcsTable(paragraphsA, paragraphsB);
   const rawChanges = backtrackDiff(lcsTable, paragraphsA, paragraphsB);

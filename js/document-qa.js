@@ -22,22 +22,6 @@ const MAX_CONTEXT_CHARS = 10000;
 /** Maximum question length */
 const MAX_QUESTION_LENGTH = 600;
 
-/**
- * Maximum conversation turns retained in qaHistory.
- * Older turns are pruned to prevent unbounded memory growth and to keep
- * the API payload within a predictable token budget.
- */
-const MAX_HISTORY_TURNS = 10;
-const CONTEXT_CACHE_LIMIT = 8;
-const STOP_WORDS = new Set([
-  'what', 'who', 'when', 'where', 'how', 'does', 'do', 'is', 'are',
-  'the', 'a', 'an', 'in', 'of', 'to', 'for', 'this', 'that', 'my',
-  'i', 'me', 'it', 'and', 'or', 'can', 'will', 'be', 'has', 'have',
-]);
-const contextCache = new Map();
-let paragraphCacheText = '';
-let paragraphCache = [];
-
 const QA_SYSTEM_PROMPT = `You are the Lexara Assistant, answering questions about a specific legal document the user has uploaded.
 
 RULES:
@@ -60,27 +44,17 @@ RULES:
 function extractRelevantContext(docText, question) {
   if (!docText) return '';
 
-  // Paragraph boundaries are stable while the loaded document is unchanged.
-  if (docText !== paragraphCacheText) {
-    paragraphCacheText = docText;
-    paragraphCache = docText.split(/\n{2,}/).filter((p) => p.trim().length > 30);
-    contextCache.clear();
-  }
-
-  const cacheKey = `${docText.length}:${question.toLowerCase().trim()}`;
-  const cachedContext = contextCache.get(cacheKey);
-  if (cachedContext) return cachedContext;
-
   // Extract significant words from the question (skip common stop words)
+  const stopWords = new Set(['what', 'who', 'when', 'where', 'how', 'does', 'do', 'is', 'are', 'the', 'a', 'an', 'in', 'of', 'to', 'for', 'this', 'that', 'my', 'i', 'me', 'it', 'and', 'or', 'can', 'will', 'be', 'has', 'have']);
   const keywords = question.toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter((w) => w.length > 3 && !STOP_WORDS.has(w));
+    .filter((w) => w.length > 3 && !stopWords.has(w));
 
   if (keywords.length === 0) return docText.slice(0, MAX_CONTEXT_CHARS);
 
-  // Score paragraphs by keyword density without repeatedly reparsing the document.
-  const paragraphs = paragraphCache;
+  // Split document into paragraphs and score each by keyword density
+  const paragraphs = docText.split(/\n{2,}/).filter((p) => p.trim().length > 30);
   const scored = paragraphs.map((para, idx) => {
     const lower = para.toLowerCase();
     const score = keywords.reduce((s, kw) => s + (lower.includes(kw) ? 2 : 0), 0)
@@ -101,12 +75,7 @@ function extractRelevantContext(docText, question) {
   }
 
   const truncated = context.length >= MAX_CONTEXT_CHARS;
-  const result = context.trim() + (truncated ? '\n\n[Additional sections omitted — ask about a specific section for more detail.]' : '');
-  contextCache.set(cacheKey, result);
-  if (contextCache.size > CONTEXT_CACHE_LIMIT) {
-    contextCache.delete(contextCache.keys().next().value);
-  }
-  return result;
+  return context.trim() + (truncated ? '\n\n[Additional sections omitted — ask about a specific section for more detail.]' : '');
 }
 
 // ─── Init shared UI ────────────────────────────────────────────────────────────
@@ -125,14 +94,6 @@ let qaHistory = [];
 
 /** @type {boolean} */
 let isAsking = false;
-
-/**
- * Currently active fetch AbortController.
- * Cancelled when the user removes the document or when a new question
- * arrives before the previous one resolves.
- * @type {AbortController|null}
- */
-let currentAbortController = null;
 
 // ─── Restore existing document ────────────────────────────────────────────────
 
@@ -184,9 +145,6 @@ document.getElementById('pasteLoadBtn')?.addEventListener('click', () => {
 });
 
 document.getElementById('removeDocBtn')?.addEventListener('click', () => {
-  // Cancel any in-flight request before clearing state
-  currentAbortController?.abort();
-  currentAbortController = null;
   clearActiveDocument();
   loadedDocumentText = '';
   qaHistory = [];
@@ -301,13 +259,7 @@ async function askQuestion(question) {
   if (isAsking || !loadedDocumentText) return;
   if (question.length > MAX_QUESTION_LENGTH) return;
 
-  // Cancel any previous in-flight request to free bandwidth
-  currentAbortController?.abort();
-  currentAbortController = new AbortController();
-
   isAsking = true;
-
-  // Cache DOM references once per call — avoid repeated querySelector
   const messagesEl = document.getElementById('qaMessages');
   const input = document.getElementById('qaInput');
   const sendBtn = document.getElementById('qaSendBtn');
@@ -330,12 +282,6 @@ async function askQuestion(question) {
   const safeQuestion = sanitizeString(sanitizePromptInjection(question), MAX_QUESTION_LENGTH);
   qaHistory.push({ role: 'user', content: safeQuestion });
 
-  // Prune history to MAX_HISTORY_TURNS pairs (user + assistant = 2 entries per turn)
-  // Always keeps the most recent turns; drops oldest to bound memory and token usage.
-  if (qaHistory.length > MAX_HISTORY_TURNS * 2) {
-    qaHistory = qaHistory.slice(qaHistory.length - MAX_HISTORY_TURNS * 2);
-  }
-
   // Use keyword-aware extraction to find the most relevant document sections
   const relevantContext = extractRelevantContext(loadedDocumentText, question);
   const documentContext = `\n\nDocument text (most relevant sections for this question):\n"""\n${relevantContext}\n"""`;
@@ -344,7 +290,6 @@ async function askQuestion(question) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      signal: currentAbortController.signal,
       body: JSON.stringify({
         messages: [
           { role: 'system', content: `${QA_SYSTEM_PROMPT}${documentContext}` },
@@ -361,18 +306,12 @@ async function askQuestion(question) {
     document.getElementById(typingId)?.remove();
     appendQaBubble('ai', reply);
   } catch (err) {
-    // AbortError is expected when the user removes the document mid-request
-    if (err.name === 'AbortError') {
-      document.getElementById(typingId)?.remove();
-      return;
-    }
     console.error('[DocumentQA] Ask error:', err.message);
     document.getElementById(typingId)?.remove();
     appendQaBubble('ai', 'Sorry, I could not process that question. Please try again.');
     qaHistory.pop();
   } finally {
     isAsking = false;
-    currentAbortController = null;
     if (sendBtn) sendBtn.disabled = false;
   }
 }
