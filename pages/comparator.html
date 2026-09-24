@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#05060f"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lexara — Document Comparator"/>
+  <meta property="og:description" content="Compare two versions of a contract side-by-side and see exactly what changed."/>
+  <meta name="description" content="Compare two legal documents and see what changed, with AI explanations of why it matters"/>
+  <title>Document Comparator — Lexara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/comparator.css"/>
+</head>
+<body>
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="seal-watermark" aria-hidden="true"></div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation"></nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Side-by-Side Analysis</div>
+    <h1>Document <span class="page-hero-accent">Comparator</span></h1>
+    <p>Upload two versions of a contract or policy and see exactly what changed — plus a plain-language explanation of why it matters.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="dual-upload-grid" id="dualUploadGrid">
+      <div class="dual-upload-slot">
+        <h3>📄 Original Version</h3>
+        <div class="upload-zone" id="uploadZoneA" role="button" tabindex="0" aria-label="Upload the original document">
+          <div class="upload-zone-icon" aria-hidden="true">📄</div>
+          <h3>Drop original here</h3>
+          <p>PDF or .txt</p>
+          <input type="file" id="fileInputA" accept=".pdf,.txt,application/pdf,text/plain" aria-label="Choose original file"/>
+        </div>
+        <div class="document-preview hidden" id="previewA">
+          <span class="document-preview-icon" aria-hidden="true">📄</span>
+          <div class="document-preview-info">
+            <div class="document-preview-name" id="previewNameA"></div>
+            <div class="document-preview-meta" id="previewMetaA"></div>
+          </div>
+          <button class="document-preview-remove" id="removeA" aria-label="Remove original document">Remove</button>
+        </div>
+      </div>
+
+      <div class="dual-upload-slot">
+        <h3>📝 Revised Version</h3>
+        <div class="upload-zone" id="uploadZoneB" role="button" tabindex="0" aria-label="Upload the revised document">
+          <div class="upload-zone-icon" aria-hidden="true">📝</div>
+          <h3>Drop revised version here</h3>
+          <p>PDF or .txt</p>
+          <input type="file" id="fileInputB" accept=".pdf,.txt,application/pdf,text/plain" aria-label="Choose revised file"/>
+        </div>
+        <div class="document-preview hidden" id="previewB">
+          <span class="document-preview-icon" aria-hidden="true">📝</span>
+          <div class="document-preview-info">
+            <div class="document-preview-name" id="previewNameB"></div>
+            <div class="document-preview-meta" id="previewMetaB"></div>
+          </div>
+          <button class="document-preview-remove" id="removeB" aria-label="Remove revised document">Remove</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="privacy-note">🔒 <strong>Both documents stay in your browser</strong> until you click Compare.</p>
+
+    <div class="compare-actions">
+      <button class="btn btn-primary" id="compareBtn" disabled aria-label="Compare documents">⚖️ Compare Documents</button>
+    </div>
+
+    <div id="diffResultsSection" class="hidden">
+      <div class="diff-summary-panel" role="region" aria-labelledby="diffSummaryTitle">
+        <h2 id="diffSummaryTitle">What Changed</h2>
+        <p id="diffSummaryText" class="diff-summary-desc"></p>
+        <div class="diff-stat-row">
+          <div class="diff-stat"><div class="diff-stat-num added" id="addedCount">0</div><div class="diff-stat-label">Added</div></div>
+          <div class="diff-stat"><div class="diff-stat-num removed" id="removedCount">0</div><div class="diff-stat-label">Removed</div></div>
+          <div class="diff-stat"><div class="diff-stat-num changed" id="modifiedCount">0</div><div class="diff-stat-label">Modified</div></div>
+        </div>
+      </div>
+
+      <h2 class="changes-heading">Changes</h2>
+      <div class="diff-change-list" id="diffChangeList" role="list" aria-label="Document changes"></div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" data-action="toggle-chat" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Lexara AI Assistant"></div>
+
+  <footer class="footer" role="contentinfo">
+    <p class="footer-disclaimer">
+      <strong>This comparison detects paragraph-level text changes.</strong> It may not catch every subtle change (e.g., a single changed number within an otherwise-identical paragraph will show as "modified" — always review the highlighted text directly).
+    </p>
+  </footer>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/comparator.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/tilteffect.js"></script>
+  <script type="module" src="../js/page-boot.js"></script>
+</body>
+</html>

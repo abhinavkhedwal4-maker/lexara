@@ -1,0 +1,162 @@
+/* ============================================
+   GLOSSARY PAGE — page-specific styles (Neon 3D Edition v2)
+   ============================================ */
+
+.glossary-search {
+  max-width: 580px;
+  margin: 0 auto 2rem;
+  position: relative;
+}
+
+.glossary-search::before {
+  content: '';
+  position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8aa3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") center/cover no-repeat;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.glossary-search input {
+  width: 100%;
+  padding: 1rem 1.4rem 1rem 3rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  backdrop-filter: blur(8px);
+}
+
+.glossary-search input::placeholder { color: var(--text-muted); }
+
+.glossary-search input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft), 0 0 28px var(--gold-soft);
+}
+
+.glossary-category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 3rem;
+}
+
+.category-filter-btn {
+  padding: 0.48rem 1.1rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.category-filter-btn:hover {
+  border-color: rgba(0,240,255,0.4);
+  color: var(--gold);
+  box-shadow: 0 0 16px var(--gold-soft);
+}
+
+.category-filter-btn.active {
+  background: linear-gradient(135deg, var(--oxblood-bright), var(--violet));
+  border-color: transparent;
+  color: var(--parchment);
+  box-shadow: 0 4px 22px var(--violet-glow);
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.6rem;
+}
+
+.glossary-term-card {
+  padding: 1.85rem;
+  background: linear-gradient(160deg, var(--glass-strong) 0%, rgba(123,47,247,0.04) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: transform 0.45s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.45s ease, border-color 0.35s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* Top accent line */
+.glossary-term-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--violet-bright), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Corner bracket */
+.glossary-term-card::after {
+  content: '';
+  position: absolute; bottom: 12px; right: 12px;
+  width: 14px; height: 14px;
+  border-bottom: 1px solid var(--gold);
+  border-right: 1px solid var(--gold);
+  opacity: 0.2;
+  transition: var(--transition);
+}
+
+.glossary-term-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(0,240,255,0.4);
+  box-shadow: var(--shadow), 0 0 36px var(--gold-soft);
+}
+.glossary-term-card:hover::before { opacity: 1; }
+.glossary-term-card:hover::after  { opacity: 0.7; width: 18px; height: 18px; }
+
+.glossary-term-card .term-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--parchment);
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+.glossary-term-card:hover .term-name { color: var(--gold-bright); }
+
+.glossary-term-card .term-category {
+  display: inline-block;
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-soft);
+  border: 1px solid rgba(0,240,255,0.3);
+  border-radius: 20px;
+  padding: 0.18rem 0.75rem;
+  margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.glossary-term-card .term-definition {
+  font-size: 0.87rem;
+  line-height: 1.68;
+  color: var(--text-muted);
+}
+
+.glossary-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 5rem 1rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+}

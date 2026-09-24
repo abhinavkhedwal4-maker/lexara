@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#05060f"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lexara — Risk Scanner"/>
+  <meta property="og:description" content="Automatically flag risk-bearing clauses in your legal documents with plain-language explanations."/>
+  <meta name="description" content="Scan a legal document for auto-renewal, indemnification, arbitration, liability caps and other risk-bearing clauses"/>
+  <title>Risk Scanner — Lexara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/risk-scanner.css"/>
+</head>
+<body>
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="seal-watermark" aria-hidden="true"></div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation"></nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Automated Clause Detection</div>
+    <h1>Risk <span class="page-hero-accent">Scanner</span></h1>
+    <p>Upload a contract or agreement to automatically flag clauses worth a closer look — auto-renewals, liability limits, arbitration terms, and more.</p>
+  </div>
+
+  <div class="page-content">
+    <div id="uploadSection">
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload a PDF or text file to scan">
+        <div class="upload-zone-icon" aria-hidden="true">📄</div>
+        <h3>Drag & drop your document here</h3>
+        <p>or click to browse — PDF or .txt, up to 10 MB</p>
+        <input type="file" id="fileInput" accept=".pdf,.txt,application/pdf,text/plain" aria-label="Choose a file"/>
+      </div>
+      <p class="privacy-note">🔒 <strong>Your document stays in your browser.</strong> Nothing is uploaded to a server during scanning.</p>
+
+      <details class="paste-section">
+        <summary>Or paste text directly</summary>
+        <textarea id="pasteInput" rows="8" placeholder="Paste your contract or agreement text here..." class="paste-textarea" aria-label="Paste document text"></textarea>
+        <button class="btn btn-primary" id="pasteScanBtn" aria-label="Scan pasted text">Scan This Text</button>
+      </details>
+    </div>
+
+    <div id="documentPreviewSection" class="hidden">
+      <div class="document-preview">
+        <span class="document-preview-icon" aria-hidden="true">📄</span>
+        <div class="document-preview-info">
+          <div class="document-preview-name" id="previewFileName"></div>
+          <div class="document-preview-meta" id="previewFileMeta"></div>
+        </div>
+        <button class="document-preview-remove" id="removeDocBtn" aria-label="Remove document and start over">Remove</button>
+      </div>
+    </div>
+
+    <div id="resultsSection" class="hidden">
+      <div class="scanner-layout">
+        <div class="risk-summary-panel" role="region" aria-labelledby="riskSummaryTitle">
+          <div class="risk-score-ring-wrap">
+            <svg class="risk-score-ring" viewBox="0 0 140 140" aria-hidden="true">
+              <defs>
+                <linearGradient id="riskRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#7dfdfe"/>
+                  <stop offset="55%" stop-color="#a78bfa"/>
+                  <stop offset="100%" stop-color="#ff4d75"/>
+                </linearGradient>
+              </defs>
+              <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+              <circle cx="70" cy="70" r="60" fill="none" stroke="url(#riskRingGradient)" stroke-width="10"
+                stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round"
+                id="riskRingCircle" transform="rotate(-90 70 70)"/>
+            </svg>
+            <div class="risk-score-num" id="riskScoreNum" aria-live="polite">0</div>
+            <div class="risk-score-label">Risk Signal</div>
+          </div>
+          <div class="risk-summary-text">
+            <h2 id="riskSummaryTitle">Scan Results</h2>
+            <p id="riskSummaryText">Analyzing your document...</p>
+            <div class="category-count-row" id="categoryCountRow"></div>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="flagged-heading">Flagged Clauses</h2>
+          <div class="clause-list" id="clauseList" role="list" aria-label="Flagged clauses"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" data-action="toggle-chat" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Lexara AI Assistant"></div>
+
+  <footer class="footer" role="contentinfo">
+    <p class="footer-disclaimer">
+      <strong>This scan is an automated triage tool, not a legal review.</strong> Flagged clauses are patterns worth discussing with a licensed attorney — absence of a flag does not mean a document is risk-free, and presence of a flag does not mean a clause is unenforceable or unfair in your situation.
+    </p>
+  </footer>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/risk-scanner.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/tilteffect.js"></script>
+  <script type="module" src="../js/page-boot.js"></script>
+</body>
+</html>

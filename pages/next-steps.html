@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#05060f"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lexara — Lawyer Prep Sheet"/>
+  <meta property="og:description" content="Generate a checklist and specific questions to bring to a real attorney."/>
+  <meta name="description" content="Prepare for a conversation with a lawyer with a generated checklist and question list"/>
+  <title>Lawyer Prep Sheet — Lexara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/next-steps.css"/>
+</head>
+<body>
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="seal-watermark" aria-hidden="true"></div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation"></nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Prepare For Your Consultation</div>
+    <h1>Lawyer <span class="page-hero-accent">Prep Sheet</span></h1>
+    <p>Make your conversation with an attorney count. Get a generated checklist, a document review priority, and specific questions to ask — built from your document.</p>
+  </div>
+
+  <div class="page-content">
+    <div id="uploadSection">
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload a PDF or text file">
+        <div class="upload-zone-icon" aria-hidden="true">📋</div>
+        <h3>Drag & drop your document here</h3>
+        <p>or click to browse — PDF or .txt, up to 10 MB</p>
+        <input type="file" id="fileInput" accept=".pdf,.txt,application/pdf,text/plain" aria-label="Choose a file"/>
+      </div>
+      <p class="privacy-note">🔒 <strong>Your document stays in your browser.</strong></p>
+
+      <details class="paste-section">
+        <summary>Or paste text directly</summary>
+        <textarea id="pasteInput" rows="8" placeholder="Paste your document text here..." class="paste-textarea" aria-label="Paste document text"></textarea>
+        <button class="btn btn-primary" id="pasteLoadBtn" aria-label="Load pasted text">Load This Text</button>
+      </details>
+    </div>
+
+    <div id="documentPreviewSection" class="hidden">
+      <div class="document-preview">
+        <span class="document-preview-icon" aria-hidden="true">📄</span>
+        <div class="document-preview-info">
+          <div class="document-preview-name" id="previewFileName"></div>
+          <div class="document-preview-meta" id="previewFileMeta"></div>
+        </div>
+        <button class="document-preview-remove" id="removeDocBtn" aria-label="Remove document and start over">Remove</button>
+      </div>
+      <div class="generate-btn-wrap">
+        <button class="btn btn-primary" id="generatePrepBtn" aria-label="Generate lawyer prep sheet">📋 Generate My Prep Sheet</button>
+      </div>
+    </div>
+
+    <div id="prepSheetSection" class="hidden">
+      <div class="prep-sheet-panel">
+        <span class="review-priority-badge" id="priorityBadge"></span>
+        <p id="prepIntroText" class="prep-intro-text"></p>
+
+        <div class="prep-section">
+          <h3 class="prep-section-title">✅ Before Your Meeting</h3>
+          <ul class="prep-checklist" id="prepChecklist" role="list"></ul>
+        </div>
+
+        <div class="prep-section">
+          <h3 class="prep-section-title">❓ Questions to Ask Your Lawyer</h3>
+          <div id="prepQuestions" role="list"></div>
+        </div>
+
+        <div class="prep-export-actions">
+          <button class="btn btn-ghost" id="printPrepBtn" aria-label="Print or save as PDF">🖨️ Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" data-action="toggle-chat" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Lexara AI Assistant"></div>
+
+  <footer class="footer" role="contentinfo">
+    <p class="footer-disclaimer">
+      <strong>This prep sheet is a starting point for your own preparation, not legal guidance.</strong> A qualified attorney may raise additional considerations specific to your situation and jurisdiction.
+    </p>
+  </footer>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/next-steps.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/tilteffect.js"></script>
+  <script type="module" src="../js/page-boot.js"></script>
+</body>
+</html>

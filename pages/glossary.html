@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#05060f"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lexara — Legal Glossary"/>
+  <meta property="og:description" content="Look up common legal terms in plain language, any time."/>
+  <meta name="description" content="Plain-language glossary of common legal and contract terminology"/>
+  <title>Legal Glossary — Lexara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/glossary.css"/>
+</head>
+<body>
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="seal-watermark" aria-hidden="true"></div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation"></nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Plain-Language Reference</div>
+    <h1>Legal <span class="page-hero-accent">Glossary</span></h1>
+    <p>Common legal and contract terms, explained in everyday language — no document upload required.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="glossary-search">
+      <label for="glossarySearchInput" class="sr-only">Search glossary terms</label>
+      <input type="text" id="glossarySearchInput" placeholder="Search terms — e.g. 'arbitration', 'renewal'..." aria-label="Search glossary terms"/>
+    </div>
+
+    <div class="glossary-category-filters" id="categoryFilters" role="group" aria-label="Filter by category"></div>
+
+    <div class="glossary-grid" id="glossaryGrid" role="list" aria-label="Glossary terms"></div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" data-action="toggle-chat" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Lexara AI Assistant"></div>
+
+  <footer class="footer" role="contentinfo">
+    <p class="footer-disclaimer">
+      <strong>Definitions are general educational information, not legal advice</strong> and may not reflect the specific meaning of a term in your jurisdiction or document.
+    </p>
+  </footer>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/glossary.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/tilteffect.js"></script>
+  <script type="module" src="../js/page-boot.js"></script>
+</body>
+</html>

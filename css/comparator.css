@@ -1,0 +1,231 @@
+/* ============================================
+   COMPARATOR PAGE — page-specific styles (Neon 3D Edition v2)
+   ============================================ */
+
+.dual-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.dual-upload-slot h3 {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dual-upload-slot .upload-zone {
+  margin-bottom: 1rem;
+}
+
+.compare-actions {
+  display: flex;
+  justify-content: center;
+  margin: 2.5rem 0 3.5rem;
+}
+
+.compare-actions .btn-primary {
+  font-size: 0.95rem;
+  padding: 1rem 2.8rem;
+  letter-spacing: 0.04em;
+}
+
+/* ---- Diff Summary Panel ---- */
+.diff-summary-panel {
+  position: relative;
+  background: linear-gradient(160deg, var(--glass-strong) 0%, rgba(123,47,247,0.06) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.25rem;
+  margin-bottom: 3rem;
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.diff-summary-panel:hover {
+  border-color: rgba(0,240,255,0.3);
+  box-shadow: 0 0 40px var(--gold-soft);
+}
+
+.diff-summary-panel::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--violet-bright), transparent);
+  opacity: 0.6;
+}
+
+.diff-summary-panel::after {
+  content: '';
+  position: absolute;
+  top: -40%; left: -10%;
+  width: 55%; height: 180%;
+  background: radial-gradient(circle, var(--violet-glow) 0%, transparent 70%);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.diff-summary-panel h2 {
+  font-size: 1.4rem;
+  color: var(--parchment);
+  position: relative;
+  z-index: 1;
+}
+
+.diff-stat-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.diff-stat {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  padding: 1.5rem 1.25rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-spring);
+  position: relative; overflow: hidden;
+}
+
+.diff-stat::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--violet-bright), transparent);
+  opacity: 0; transition: opacity 0.4s ease;
+}
+
+.diff-stat:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0,240,255,0.35);
+  box-shadow: 0 0 24px var(--gold-soft);
+}
+.diff-stat:hover::before { opacity: 1; }
+
+.diff-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.diff-stat-num.added   { color: var(--risk-low);    text-shadow: 0 0 22px rgba(47,255,176,0.4); }
+.diff-stat-num.removed { color: var(--risk-high);   text-shadow: 0 0 22px rgba(255,47,109,0.4); }
+.diff-stat-num.changed { color: var(--gold);        text-shadow: 0 0 22px var(--gold-soft); }
+
+.diff-stat-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---- Change List ---- */
+.diff-change-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.diff-change-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.35rem 1.5rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s ease, border-color 0.35s ease;
+  animation: fadeInUp 0.4s ease both;
+  backdrop-filter: blur(8px);
+}
+
+.diff-change-item:hover {
+  transform: translateX(6px);
+  border-color: rgba(0,240,255,0.3);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.35);
+}
+
+.diff-change-item.added   { border-left-color: var(--risk-low); }
+.diff-change-item.removed { border-left-color: var(--risk-high); }
+.diff-change-item.changed { border-left-color: var(--gold); }
+
+.diff-change-item.added:hover   { border-left-color: var(--risk-low);  box-shadow: 0 6px 28px rgba(47,255,176,0.12); }
+.diff-change-item.removed:hover { border-left-color: var(--risk-high); box-shadow: 0 6px 28px rgba(255,47,109,0.12); }
+.diff-change-item.changed:hover { border-left-color: var(--gold);      box-shadow: 0 6px 28px var(--gold-soft); }
+
+.diff-change-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.diff-change-body { flex: 1; min-width: 0; }
+
+.diff-change-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 0.6rem;
+  display: inline-block;
+  padding: 0.18rem 0.65rem;
+  border-radius: 20px;
+}
+
+.diff-change-item.added   .diff-change-label { color: var(--risk-low);    background: rgba(47,255,176,0.14); }
+.diff-change-item.removed .diff-change-label { color: var(--risk-high);   background: rgba(255,47,109,0.14); }
+.diff-change-item.changed .diff-change-label { color: var(--gold);        background: var(--gold-soft); }
+
+.diff-change-text {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.diff-change-text .old-text {
+  color: var(--risk-high);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.diff-change-text .new-text {
+  color: var(--risk-low);
+  font-weight: 500;
+}
+
+.diff-explanation {
+  margin-top: 0.85rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  background: rgba(123,47,247,0.04);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.diff-explanation::before {
+  content: '✦ ';
+  font-style: normal;
+  color: var(--violet-bright);
+}
+
+@media (max-width: 640px) {
+  .diff-stat-row { flex-direction: column; }
+  .diff-change-item { flex-direction: column; gap: 0.5rem; }
+}

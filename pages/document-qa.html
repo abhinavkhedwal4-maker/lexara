@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#05060f"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lexara — Ask My Document"/>
+  <meta property="og:description" content="Ask questions in plain English and get answers grounded in your specific document."/>
+  <meta name="description" content="Ask questions about your legal document and get grounded, cited answers"/>
+  <title>Ask My Document — Lexara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/document-qa.css"/>
+</head>
+<body>
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="seal-watermark" aria-hidden="true"></div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation"></nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Grounded Document Q&A</div>
+    <h1>Ask <span class="page-hero-accent">My Document</span></h1>
+    <p>Ask questions about your specific document in plain English. Answers are grounded in your document's actual text — if it's not in there, we'll say so.</p>
+  </div>
+
+  <div class="page-content">
+    <div id="uploadSection">
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload a PDF or text file to ask about">
+        <div class="upload-zone-icon" aria-hidden="true">💬</div>
+        <h3>Drag & drop your document here</h3>
+        <p>or click to browse — PDF or .txt, up to 10 MB</p>
+        <input type="file" id="fileInput" accept=".pdf,.txt,application/pdf,text/plain" aria-label="Choose a file"/>
+      </div>
+      <p class="privacy-note">🔒 <strong>Your document stays in your browser.</strong> Only the parts relevant to your question are sent to the AI.</p>
+
+      <details class="paste-section">
+        <summary>Or paste text directly</summary>
+        <textarea id="pasteInput" rows="8" placeholder="Paste your document text here..." class="paste-textarea" aria-label="Paste document text"></textarea>
+        <button class="btn btn-primary" id="pasteLoadBtn" aria-label="Load pasted text">Load This Text</button>
+      </details>
+    </div>
+
+    <div id="documentPreviewSection" class="hidden">
+      <div class="document-preview">
+        <span class="document-preview-icon" aria-hidden="true">📄</span>
+        <div class="document-preview-info">
+          <div class="document-preview-name" id="previewFileName"></div>
+          <div class="document-preview-meta" id="previewFileMeta"></div>
+        </div>
+        <button class="document-preview-remove" id="removeDocBtn" aria-label="Remove document and start over">Remove</button>
+      </div>
+    </div>
+
+    <div id="qaSection" class="hidden">
+      <div class="qa-layout">
+        <aside class="qa-sidebar">
+          <h3>Try asking...</h3>
+          <button class="suggested-question-btn" data-question="What are my main obligations under this document?">What are my main obligations?</button>
+          <button class="suggested-question-btn" data-question="Can this agreement be terminated early, and how?">Can this be terminated early?</button>
+          <button class="suggested-question-btn" data-question="What happens if I miss a payment or deadline?">What if I miss a deadline?</button>
+          <button class="suggested-question-btn" data-question="Are there any fees or penalties mentioned?">Are there fees or penalties?</button>
+          <button class="suggested-question-btn" data-question="What rights does the other party have that I should know about?">What rights does the other party have?</button>
+        </aside>
+
+        <div class="qa-conversation">
+          <div class="qa-messages" id="qaMessages" role="log" aria-live="polite">
+            <div class="qa-empty-state">
+              <div class="icon" aria-hidden="true">💬</div>
+              <p>Ask a question below, or try one of the suggestions on the left.</p>
+            </div>
+          </div>
+          <div class="qa-input-area">
+            <div class="qa-input-row">
+              <label for="qaInput" class="sr-only">Ask a question about your document</label>
+              <textarea id="qaInput" rows="1" placeholder="Ask about your document..." aria-label="Ask about your document"></textarea>
+              <button class="btn btn-primary" id="qaSendBtn" aria-label="Send question">Ask</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" data-action="toggle-chat" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Lexara AI Assistant"></div>
+
+  <footer class="footer" role="contentinfo">
+    <p class="footer-disclaimer">
+      <strong>Answers are generated from your document's text and may not be complete or fully accurate.</strong> Always verify important details against the original document and consult a licensed attorney for decisions that matter.
+    </p>
+  </footer>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/document-qa.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/tilteffect.js"></script>
+  <script type="module" src="../js/page-boot.js"></script>
+</body>
+</html>

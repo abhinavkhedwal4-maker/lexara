@@ -1,0 +1,17 @@
+{
+  "name": "lexara",
+  "version": "1.0.0",
+  "description": "GenAI-enabled legal document assistant — simplification, risk scanning, comparison, grounded Q&A, and lawyer-prep tools. Information and assistance, not legal advice.",
+  "main": "server.js",
+  "engines": { "node": ">=18.0.0" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/app.test.js",
+    "lint": "eslint js/ api/ server.js --ext .js",
+    "lint:fix": "eslint js/ api/ server.js --ext .js --fix"
+  },
+  "keywords": ["legal-tech", "genai", "document-analysis", "groq", "firebase", "accessibility"],
+  "license": "MIT",
+  "dependencies": { "dotenv": "^16.4.5" },
+  "devDependencies": { "eslint": "^8.57.0" }
+}

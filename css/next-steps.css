@@ -1,0 +1,187 @@
+/* ============================================
+   LAWYER PREP SHEET PAGE — page-specific styles (Neon 3D Edition v2)
+   ============================================ */
+
+.prep-sheet-panel {
+  position: relative;
+  background: linear-gradient(160deg, var(--glass-strong) 0%, rgba(123,47,247,0.06) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.75rem;
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.prep-sheet-panel:hover {
+  border-color: rgba(0,240,255,0.3);
+  box-shadow: 0 0 40px var(--gold-soft);
+}
+
+/* Top neon bar */
+.prep-sheet-panel::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--violet-bright), transparent);
+  opacity: 0.65;
+}
+
+/* Ambient orb */
+.prep-sheet-panel::after {
+  content: '';
+  position: absolute;
+  top: -30%; right: -10%;
+  width: 50%; height: 160%;
+  background: radial-gradient(circle, var(--violet-glow) 0%, transparent 70%);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.review-priority-badge {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 1.1rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 1.5rem;
+  background: var(--gold-soft);
+  color: var(--gold);
+  border: 1px solid rgba(0,240,255,0.35);
+}
+
+.review-priority-badge.low    { background: rgba(47,255,176,0.14);  color: var(--risk-low);    border-color: rgba(47,255,176,0.35);  box-shadow: 0 0 14px rgba(47,255,176,0.15); }
+.review-priority-badge.medium { background: rgba(255,176,58,0.14);  color: var(--risk-medium); border-color: rgba(255,176,58,0.35);  box-shadow: 0 0 14px rgba(255,176,58,0.15); }
+.review-priority-badge.high   { background: rgba(255,47,109,0.18);  color: var(--risk-high);   border-color: rgba(255,47,109,0.4);   box-shadow: 0 0 14px rgba(255,47,109,0.18); }
+
+.prep-section {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2.5rem;
+}
+
+.prep-section-title {
+  font-size: 1rem;
+  color: var(--parchment);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.prep-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.prep-checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem 1.25rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  color: var(--text);
+  transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s ease, border-color 0.35s ease;
+  line-height: 1.55;
+}
+
+.prep-checklist-item:hover {
+  border-color: rgba(0,240,255,0.3);
+  transform: translateX(5px);
+  box-shadow: 0 0 16px var(--gold-soft);
+}
+
+.prep-checklist-item::before {
+  content: '';
+  flex-shrink: 0;
+  width: 18px; height: 18px;
+  margin-top: 0.1rem;
+  border-radius: 5px;
+  border: 1.5px solid var(--gold);
+  background: var(--gold-dim);
+  box-shadow: 0 0 8px var(--gold-soft);
+}
+
+#prepQuestions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.prep-question-card {
+  padding: 1.2rem 1.4rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius-sm);
+  transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s ease;
+  position: relative;
+}
+
+.prep-question-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.3), 0 0 22px var(--gold-soft);
+  border-color: rgba(0,240,255,0.3);
+  border-left-color: var(--gold);
+}
+
+.prep-question-card .question-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--parchment);
+  margin-bottom: 0.45rem;
+  line-height: 1.45;
+}
+
+.prep-question-card .question-why {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.prep-export-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+@media print {
+  .navbar,
+  .chatbot-panel,
+  .chatbot-overlay,
+  .footer,
+  .prep-export-actions,
+  .seal-watermark,
+  .hud-grid-overlay {
+    display: none !important;
+  }
+  body { background: #fff; color: #111; }
+  .prep-sheet-panel {
+    border: none; background: none; box-shadow: none;
+    padding: 0;
+  }
+  .prep-checklist-item::before {
+    border-color: #333; background: none; box-shadow: none;
+  }
+  .prep-question-card { border-left-color: #333; }
+}

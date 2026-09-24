@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#08080c"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lexara — Document Simplifier"/>
+  <meta property="og:description" content="Turn dense legal language into plain English, at a reading level you choose."/>
+  <meta name="description" content="Simplify complex legal documents into plain language with AI"/>
+  <title>Document Simplifier — Lexara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/simplifier.css"/>
+</head>
+<body>
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="seal-watermark" aria-hidden="true"></div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation"></nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Plain-Language Rewriting</div>
+    <h1>Document <span class="page-hero-accent">Simplifier</span></h1>
+    <p>Upload or paste a legal document and get a side-by-side plain-language explanation, at whatever reading level works for you.</p>
+  </div>
+
+  <div class="page-content">
+    <div id="uploadSection">
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload a PDF or text file to simplify">
+        <div class="upload-zone-icon" aria-hidden="true">📖</div>
+        <h3>Drag & drop your document here</h3>
+        <p>or click to browse — PDF or .txt, up to 10 MB</p>
+        <input type="file" id="fileInput" accept=".pdf,.txt,application/pdf,text/plain" aria-label="Choose a file"/>
+      </div>
+      <p class="privacy-note">🔒 <strong>Your document stays in your browser.</strong> It's only sent to the AI when you click Simplify.</p>
+
+      <details class="paste-section">
+        <summary>Or paste text directly</summary>
+        <textarea id="pasteInput" rows="8" placeholder="Paste your document text here..." class="paste-textarea" aria-label="Paste document text"></textarea>
+        <button class="btn btn-primary" id="pasteLoadBtn" aria-label="Load pasted text">Load This Text</button>
+      </details>
+    </div>
+
+    <div id="documentPreviewSection" class="hidden">
+      <div class="document-preview">
+        <span class="document-preview-icon" aria-hidden="true">📄</span>
+        <div class="document-preview-info">
+          <div class="document-preview-name" id="previewFileName"></div>
+          <div class="document-preview-meta" id="previewFileMeta"></div>
+        </div>
+        <button class="document-preview-remove" id="removeDocBtn" aria-label="Remove document and start over">Remove</button>
+      </div>
+
+      <div class="simplifier-controls">
+        <span class="hud-label">Reading level:</span>
+        <div class="reading-level-group" role="radiogroup" aria-label="Reading level">
+          <button class="reading-level-btn active" data-level="plain" role="radio" aria-checked="true">Plain English</button>
+          <button class="reading-level-btn" data-level="simple" role="radio" aria-checked="false">Very Simple</button>
+          <button class="reading-level-btn" data-level="detailed" role="radio" aria-checked="false">Detailed</button>
+        </div>
+        <button class="btn btn-primary simplify-btn" id="simplifyBtn" aria-label="Simplify document">✨ Simplify</button>
+      </div>
+    </div>
+
+    <div id="resultsSection" class="hidden">
+      <div class="comparison-view">
+        <div class="comparison-panel">
+          <div class="comparison-panel-header original">📄 Original Text</div>
+          <div class="comparison-panel-body original-text" id="originalTextPanel"></div>
+        </div>
+        <div class="comparison-panel">
+          <div class="comparison-panel-header simplified">✨ Simplified</div>
+          <div class="comparison-panel-body simplified-text" id="simplifiedTextPanel" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" data-action="toggle-chat" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Lexara AI Assistant"></div>
+
+  <footer class="footer" role="contentinfo">
+    <p class="footer-disclaimer">
+      <strong>Simplified text is an aid to understanding, not a substitute for the original document.</strong> The original legal document always governs — if the simplified version and the original differ, the original controls.
+    </p>
+  </footer>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/simplifier.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/tilteffect.js"></script>
+  <script type="module" src="../js/page-boot.js"></script>
+</body>
+</html>

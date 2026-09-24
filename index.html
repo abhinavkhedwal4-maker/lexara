@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#08080c"/>
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Lexara — AI for Legal Access &amp; Assistance"/>
+  <meta property="og:description" content="Understand, compare, and navigate legal documents with GenAI-powered plain-language explanations, risk detection, and lawyer-prep tools."/>
+  <meta name="description" content="Lexara — AI-powered legal document simplification, risk scanning, comparison, and Q&amp;A. Information and assistance, not a substitute for professional legal advice."/>
+  <title>Lexara — AI for Legal Access &amp; Assistance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <!-- HUD decorative grid -->
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="seal-watermark" aria-hidden="true"></div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation"></nav>
+
+  <!-- ============================
+       HERO
+       ============================ -->
+  <section class="hero" id="main-content" aria-labelledby="heroTitle">
+
+    <div class="hero-badge" role="status">GenAI-Powered Legal Access</div>
+
+    <h1 class="hero-title" id="heroTitle">
+      <span class="title-line">Understand What</span>
+      <span class="title-line accent">You're Signing.</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Lexara helps you read, understand, compare, and ask questions about legal documents — in plain language, at your own pace, before you talk to a lawyer.
+    </p>
+
+    <div class="hero-cta">
+      <a href="pages/risk-scanner.html" class="btn btn-primary" aria-label="Scan a document for risks">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Scan for Risks
+      </a>
+      <a href="pages/simplifier.html" class="btn btn-ghost" aria-label="Simplify a legal document">Simplify a Document →</a>
+    </div>
+
+    <p class="hero-disclaimer">
+      <strong>Lexara provides information and assistance, not legal advice.</strong> It cannot replace a licensed attorney and does not create an attorney-client relationship. For decisions that matter, consult a qualified lawyer — Lexara can help you prepare for that conversation.
+    </p>
+
+    <!-- Floating 3D ambient orbs -->
+    <div class="hero-orb hero-orb--cyan"  aria-hidden="true"></div>
+    <div class="hero-orb hero-orb--violet" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb--magenta" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============================
+       HUD DIVIDER
+       ============================ -->
+  <div class="hud-divider" aria-hidden="true">
+    <span class="hud-divider-line"></span>
+    <span class="hud-divider-dot"></span>
+    <span class="hud-divider-label">SYS // CAPABILITY MATRIX</span>
+    <span class="hud-divider-dot"></span>
+    <span class="hud-divider-line"></span>
+  </div>
+
+  <!-- ============================
+       FEATURES
+       ============================ -->
+  <section class="features" aria-labelledby="featuresTitle">
+    <div class="section-label">What You Can Do</div>
+    <h2 class="section-title" id="featuresTitle">Six Ways to Make Sense<br/>of Any Legal Document</h2>
+
+    <div class="cards-grid" id="cardsGrid">
+
+      <a href="pages/simplifier.html" class="feature-card" aria-label="Document Simplifier">
+        <div class="card-corner" aria-hidden="true"></div>
+        <div class="card-icon" aria-hidden="true">📖</div>
+        <div class="card-hud-tag" aria-hidden="true">MODULE · 01</div>
+        <h3>Document Simplifier</h3>
+        <p>Turn dense legal language into plain English, at a reading level you choose.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="pages/risk-scanner.html" class="feature-card" aria-label="Risk Scanner">
+        <div class="card-corner" aria-hidden="true"></div>
+        <div class="card-icon" aria-hidden="true">🔍</div>
+        <div class="card-hud-tag" aria-hidden="true">MODULE · 02</div>
+        <h3>Risk Scanner</h3>
+        <p>Automatically flag auto-renewals, liability caps, arbitration clauses and more — with plain-language explanations.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="pages/comparator.html" class="feature-card" aria-label="Document Comparator">
+        <div class="card-corner" aria-hidden="true"></div>
+        <div class="card-icon" aria-hidden="true">⚖️</div>
+        <div class="card-hud-tag" aria-hidden="true">MODULE · 03</div>
+        <h3>Document Comparator</h3>
+        <p>Compare two versions of a contract side-by-side and see exactly what changed — and why it matters.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="pages/document-qa.html" class="feature-card" aria-label="Ask My Document">
+        <div class="card-corner" aria-hidden="true"></div>
+        <div class="card-icon" aria-hidden="true">💬</div>
+        <div class="card-hud-tag" aria-hidden="true">MODULE · 04</div>
+        <h3>Ask My Document</h3>
+        <p>Ask questions in plain English and get answers grounded in your specific document — with citations.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="pages/next-steps.html" class="feature-card" aria-label="Lawyer Prep Sheet">
+        <div class="card-corner" aria-hidden="true"></div>
+        <div class="card-icon" aria-hidden="true">📋</div>
+        <div class="card-hud-tag" aria-hidden="true">MODULE · 05</div>
+        <h3>Lawyer Prep Sheet</h3>
+        <p>Generate a checklist and specific questions to bring to a real attorney — make that conversation count.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <a href="pages/glossary.html" class="feature-card" aria-label="Legal Glossary">
+        <div class="card-corner" aria-hidden="true"></div>
+        <div class="card-icon" aria-hidden="true">📚</div>
+        <div class="card-hud-tag" aria-hidden="true">MODULE · 06</div>
+        <h3>Legal Glossary</h3>
+        <p>Look up common legal terms in plain language, any time — no document required.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ============================
+       HUD DIVIDER
+       ============================ -->
+  <div class="hud-divider" aria-hidden="true">
+    <span class="hud-divider-line"></span>
+    <span class="hud-divider-dot"></span>
+    <span class="hud-divider-label">SYS // SYSTEM INTEGRITY</span>
+    <span class="hud-divider-dot"></span>
+    <span class="hud-divider-line"></span>
+  </div>
+
+  <!-- ============================
+       STATS
+       ============================ -->
+  <section class="stats-section" aria-labelledby="statsTitle">
+    <div class="section-label">Built for Access</div>
+    <h2 class="section-title" id="statsTitle">Legal Understanding, Without the Barrier</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon" aria-hidden="true">🔒</span>
+        <h4>Privacy First</h4>
+        <p>Documents are parsed entirely in your browser. Nothing is stored unless you choose to save it.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon" aria-hidden="true">📄</span>
+        <h4>PDF &amp; Text Support</h4>
+        <p>Drag and drop a PDF or paste text directly — no conversion needed.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon" aria-hidden="true">🌍</span>
+        <h4>Plain Language</h4>
+        <p>Every explanation is written for a general reader, not a law degree.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon" aria-hidden="true">⚖️</span>
+        <h4>Advice-Safe by Design</h4>
+        <p>Lexara explains and prepares — it never tells you what decision to make.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       CHATBOT
+       ============================ -->
+  <div class="chatbot-overlay" id="chatOverlay" data-action="toggle-chat" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Lexara AI Assistant"></div>
+
+  <!-- ============================
+       FOOTER
+       ============================ -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">Lex<span class="accent-letter">a</span>ra</span>
+        <p>AI for Legal Access &amp; Assistance.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="pages/simplifier.html">Simplifier</a>
+        <a href="pages/risk-scanner.html">Risk Scanner</a>
+        <a href="pages/comparator.html">Comparator</a>
+        <a href="pages/document-qa.html">Ask My Document</a>
+        <a href="pages/glossary.html">Glossary</a>
+      </nav>
+    </div>
+    <p class="footer-disclaimer">
+      <strong>Lexara is not a law firm and does not provide legal advice.</strong> Use of this tool does not create an attorney-client relationship. Always consult a licensed attorney for decisions that affect your legal rights or obligations.
+    </p>
+  </footer>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

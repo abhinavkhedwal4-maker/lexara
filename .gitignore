@@ -1,0 +1,17 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+dist/
+build/
+.vercel/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*.log
+npm-debug.log*
+.eslintcache
+.cache/
