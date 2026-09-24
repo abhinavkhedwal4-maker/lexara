@@ -220,7 +220,10 @@ function renderRiskScore(score) {
     setTimeout(() => {
       circle.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
       circle.style.strokeDashoffset = String(offset);
-      circle.style.stroke = score >= RISK_THRESHOLDS.medium ? 'var(--risk-high)' : score >= RISK_THRESHOLDS.low ? 'var(--risk-medium)' : 'var(--gold)';
+      let strokeColor = 'var(--gold)';
+      if (score >= RISK_THRESHOLDS.medium) strokeColor = 'var(--risk-high)';
+      else if (score >= RISK_THRESHOLDS.low) strokeColor = 'var(--risk-medium)';
+      circle.style.stroke = strokeColor;
     }, 150);
   }
 }

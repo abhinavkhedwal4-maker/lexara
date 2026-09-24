@@ -13,7 +13,7 @@ function initScrollProgress() {
   const update = () => {
     const st = window.scrollY || document.documentElement.scrollTop;
     const dh = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.width = dh > 0 ? Math.min((st / dh) * 100, 100) + '%' : '0%';
+    bar.style.width = dh > 0 ? `${Math.min((st / dh) * 100, 100)}%` : '0%';
   };
   window.addEventListener('scroll', update, { passive: true });
   update();

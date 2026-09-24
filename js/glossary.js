@@ -11,7 +11,7 @@
 'use strict';
 
 import { renderNavbar, renderChatPanel, wireGlobalActions, debounce, sanitizeString } from './shared.js';
-import { GLOSSARY_TERMS, getGlossaryCategories, searchGlossary } from './legal-glossary-data.js';
+import { getGlossaryCategories, searchGlossary } from './legal-glossary-data.js';
 
 // ─── Init shared UI ────────────────────────────────────────────────────────────
 

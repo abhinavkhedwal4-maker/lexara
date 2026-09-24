@@ -68,10 +68,10 @@ function extractRelevantContext(docText, question) {
   const rest = scored.slice(1).sort((a, b) => b.score - a.score);
 
   // Build context from highest-scoring paragraphs up to MAX_CONTEXT_CHARS
-  let context = firstPara + '\n\n';
+  let context = `${firstPara}\n\n`;
   for (const item of rest) {
     if (context.length + item.para.length + 2 > MAX_CONTEXT_CHARS) break;
-    context += item.para + '\n\n';
+    context += `${item.para}\n\n`;
   }
 
   const truncated = context.length >= MAX_CONTEXT_CHARS;
