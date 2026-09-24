@@ -3,7 +3,7 @@
  * @description Secure Node.js server mirroring api/chat.js's validation
  *              and Groq-proxy logic exactly, so `npm start` behaves
  *              identically to the Vercel production deployment.
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 'use strict';
@@ -18,6 +18,18 @@ const MAX_BODY    = 1024 * 80;
 const RATE_WINDOW = 60 * 1000;
 const GENERAL_RATE_LIMIT = 100;
 const AI_RATE_LIMIT      = 20;
+
+/**
+ * Ordered fallback ladder: primary model first, then progressively more
+ * conservative alternatives. Provides resilience against model deprecation,
+ * quota exhaustion, and transient availability issues.
+ * @type {ReadonlyArray<string>}
+ */
+const MODEL_LADDER = Object.freeze([
+  'llama-3.3-70b-versatile',  // Primary — best reasoning for legal context
+  'llama-3.1-8b-instant',     // Fallback 1 — fast, still instruction-following
+  'mixtral-8x7b-32768',       // Fallback 2 — wide context window, useful for long docs
+]);
 
 /** @type {Map<string, {count:number, reset:number}>} */
 const rateLimitStore = new Map();
@@ -43,6 +55,7 @@ const INJECTION_PATTERNS = [
   /new instructions\s*:/gi,
   /^system\s*:/gim,
   /you are now/gi,
+  /\[INST\]|<\|im_start\|>/gi,
 ];
 
 /**
@@ -156,7 +169,46 @@ function validateMessages(messages) {
 }
 
 /**
- * Handles POST /api/chat — proxies validated requests to the Groq API.
+ * Attempts a Groq API call against a single model.
+ * @param {string} model
+ * @param {Array} sanitizedMessages
+ * @returns {Promise<{ok:boolean, status:number, reply?:string, error?:string, modelNotFound?:boolean}>}
+ */
+async function tryGroqModel(model, sanitizedMessages) {
+  try {
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: sanitizedMessages,
+        temperature: 0.4,
+        max_tokens: 900,
+        stream: false,
+      }),
+    });
+
+    const data = await groqRes.json();
+
+    if (!groqRes.ok) {
+      const errMsg = data.error?.message || 'Groq API error';
+      const modelNotFound = data.error?.code === 'model_not_found' || /does not exist/i.test(errMsg);
+      return { ok: false, status: groqRes.status, error: errMsg, modelNotFound };
+    }
+
+    const reply = data.choices?.[0]?.message?.content;
+    return { ok: true, status: 200, reply: reply || null };
+  } catch (err) {
+    return { ok: false, status: 502, error: err.message };
+  }
+}
+
+/**
+ * Handles POST /api/chat — proxies validated requests through the model
+ * fallback ladder to Groq.
  * @param {http.IncomingMessage} req
  * @param {http.ServerResponse} res
  * @returns {Promise<void>}
@@ -191,46 +243,53 @@ async function handleChatAPI(req, res) {
     return;
   }
 
-  try {
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-        messages: validation.sanitized,
-        temperature: 0.4,
-        max_tokens: 900,
-        stream: false,
-      }),
-    });
+  // Build the model ladder: env override first, then the static fallback list
+  const envModel = process.env.GROQ_MODEL;
+  const ladder = envModel
+    ? [envModel, ...MODEL_LADDER.filter((m) => m !== envModel)]
+    : [...MODEL_LADDER];
 
-    const data = await groqRes.json();
+  let lastError = 'Failed to reach AI service';
+  let lastStatus = 502;
 
-    if (!groqRes.ok) {
-      const errMsg = data.error?.message || 'Groq API error';
-      if (data.error?.code === 'model_not_found' || /does not exist/i.test(errMsg)) {
-        console.error('[Groq Config] GROQ_MODEL is invalid or deprecated:', process.env.GROQ_MODEL || 'openai/gpt-oss-120b', '—', errMsg);
-      } else {
-        console.error('[Groq Error]', errMsg);
+  for (const model of ladder) {
+    const result = await tryGroqModel(model, validation.sanitized);
+
+    if (result.ok) {
+      if (!result.reply) {
+        respondJSON(res, 500, { error: 'Empty AI response' });
+        return;
       }
-      respondJSON(res, groqRes.status, { error: errMsg });
+      respondJSON(res, 200, { reply: result.reply });
       return;
     }
 
-    const reply = data.choices?.[0]?.message?.content;
-    if (!reply) {
-      respondJSON(res, 500, { error: 'Empty AI response' });
-      return;
+    if (result.modelNotFound) {
+      console.warn(`[Groq Fallback] Model "${model}" not found — trying next in ladder`);
+      continue;
     }
 
-    respondJSON(res, 200, { reply });
-  } catch (err) {
-    console.error('[Groq Fetch Error]', err.message);
-    respondJSON(res, 502, { error: 'Failed to reach AI service' });
+    lastError = result.error || lastError;
+    lastStatus = result.status || lastStatus;
+    console.warn(`[Groq Fallback] Model "${model}" failed (${result.status}): ${result.error}`);
   }
+
+  console.error('[Groq Fetch Error] All models exhausted:', lastError);
+  respondJSON(res, lastStatus >= 400 && lastStatus < 600 ? lastStatus : 502, { error: lastError });
+}
+
+/**
+ * Handles GET /api/health — server and configuration status check.
+ * @param {http.ServerResponse} res
+ */
+function handleHealthAPI(res) {
+  respondJSON(res, 200, {
+    status: 'ok',
+    hasGroqKey: !!process.env.GROQ_API_KEY,
+    model: process.env.GROQ_MODEL || MODEL_LADDER[0],
+    modelLadder: MODEL_LADDER,
+    timestamp: new Date().toISOString(),
+  });
 }
 
 /**
@@ -329,6 +388,11 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.url === '/api/health' && req.method === 'GET') {
+    handleHealthAPI(res);
+    return;
+  }
+
   if (req.url === '/api/chat' && req.method === 'POST') {
     try {
       await handleChatAPI(req, res);
@@ -347,7 +411,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   const groq = process.env.GROQ_API_KEY ? '✅ Loaded' : '❌ Missing — check .env';
-  const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  const model = process.env.GROQ_MODEL || MODEL_LADDER[0];
 
   const lines = [
     '⚖️  Lexara Server v1.0',

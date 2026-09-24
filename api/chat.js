@@ -12,6 +12,18 @@ const GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions';
 const MAX_MESSAGES = 50;
 const MAX_CONTENT  = 8000; // higher than typical chat apps — must fit document excerpts
 
+/**
+ * Ordered fallback ladder: primary model first, then progressively more
+ * conservative alternatives. Provides resilience against model deprecation,
+ * quota exhaustion, and transient availability issues.
+ * @type {ReadonlyArray<string>}
+ */
+const MODEL_LADDER = Object.freeze([
+  'llama-3.3-70b-versatile',   // Primary — best reasoning for legal context
+  'llama-3.1-8b-instant',      // Fallback 1 — fast, still instruction-following
+  'mixtral-8x7b-32768',        // Fallback 2 — wide context window, useful for long docs
+]);
+
 /** Patterns indicating an attempt to override the system prompt */
 const INJECTION_PATTERNS = [
   /ignore (all |previous |prior )?instructions/gi,
@@ -19,6 +31,7 @@ const INJECTION_PATTERNS = [
   /new instructions\s*:/gi,
   /^system\s*:/gim,
   /you are now/gi,
+  /\[INST\]|<\|im_start\|>/gi,
 ];
 
 /**
@@ -80,6 +93,44 @@ function validateMessages(messages) {
 }
 
 /**
+ * Attempts a Groq API call against a single model.
+ * @param {string} model
+ * @param {Array} sanitizedMessages
+ * @returns {Promise<{ok:boolean, status:number, reply?:string, error?:string, modelNotFound?:boolean}>}
+ */
+async function tryGroqModel(model, sanitizedMessages) {
+  try {
+    const groqRes = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: sanitizedMessages,
+        temperature: 0.4,
+        max_tokens: 900,
+        stream: false,
+      }),
+    });
+
+    const data = await groqRes.json();
+
+    if (!groqRes.ok) {
+      const errMsg = data.error?.message || 'Groq API error';
+      const modelNotFound = data.error?.code === 'model_not_found' || /does not exist/i.test(errMsg);
+      return { ok: false, status: groqRes.status, error: errMsg, modelNotFound };
+    }
+
+    const reply = data.choices?.[0]?.message?.content;
+    return { ok: true, status: 200, reply: reply || null };
+  } catch (err) {
+    return { ok: false, status: 502, error: err.message };
+  }
+}
+
+/**
  * Vercel serverless handler for the /api/chat endpoint.
  * @param {import('http').IncomingMessage} req
  * @param {import('http').ServerResponse} res
@@ -116,39 +167,44 @@ export default async function handler(req, res) {
     return;
   }
 
-  try {
-    const groqRes = await fetch(GROQ_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-        messages: validation.sanitized,
-        temperature: 0.4,
-        max_tokens: 900,
-        stream: false,
-      }),
-    });
+  if (!validation.valid) {
+    res.status(400).json({ error: validation.error || 'Invalid request' });
+    return;
+  }
 
-    const data = await groqRes.json();
+  // Build the model ladder: env override first, then the static fallback list
+  const envModel = process.env.GROQ_MODEL;
+  const ladder = envModel
+    ? [envModel, ...MODEL_LADDER.filter((m) => m !== envModel)]
+    : [...MODEL_LADDER];
 
-    if (!groqRes.ok) {
-      const errMsg = data.error?.message || 'Groq API error';
-      if (data.error?.code === 'model_not_found' || /does not exist/i.test(errMsg)) {
-        console.error('[Groq Config] GROQ_MODEL is invalid or deprecated:', process.env.GROQ_MODEL || 'openai/gpt-oss-120b', '—', errMsg);
+  let lastError = 'Failed to reach AI service. Please try again.';
+  let lastStatus = 502;
+
+  for (const model of ladder) {
+    const result = await tryGroqModel(model, validation.sanitized);
+
+    if (result.ok) {
+      if (!result.reply) {
+        res.status(500).json({ error: 'Empty AI response' });
+        return;
       }
-      res.status(groqRes.status).json({ error: errMsg });
+      res.status(200).json({ reply: result.reply });
       return;
     }
 
-    const reply = data.choices?.[0]?.message?.content;
-    if (!reply) { res.status(500).json({ error: 'Empty AI response' }); return; }
+    if (result.modelNotFound) {
+      // Model doesn't exist — try next in ladder immediately
+      console.warn(`[Groq Fallback] Model "${model}" not found — trying next in ladder`);
+      continue;
+    }
 
-    res.status(200).json({ reply });
-  } catch (err) {
-    console.error('[Groq Proxy Error]', err.message);
-    res.status(502).json({ error: 'Failed to reach AI service. Please try again.' });
+    // For non-model-not-found errors (rate limits, 5xx), record and try next
+    lastError = result.error || lastError;
+    lastStatus = result.status || lastStatus;
+    console.warn(`[Groq Fallback] Model "${model}" failed (${result.status}): ${result.error}`);
   }
+
+  console.error('[Groq Proxy Error] All models in ladder exhausted:', lastError);
+  res.status(lastStatus >= 400 && lastStatus < 600 ? lastStatus : 502).json({ error: lastError });
 }
