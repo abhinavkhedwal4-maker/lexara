@@ -12,6 +12,7 @@
 import { renderNavbar, renderChatPanel, wireGlobalActions, sanitizeString } from './shared.js';
 import { parseDocument, formatFileSize } from './pdf-parser.js';
 import { diffDocuments, summarizeDiff, getSubstantiveChanges } from './document-diff.js';
+import { scanDocument } from './clause-patterns.js';
 
 // ─── Init shared UI ────────────────────────────────────────────────────────────
 
@@ -148,8 +149,12 @@ function runComparison() {
   currentChanges = diffDocuments(documentA.text, documentB.text);
   const summary = summarizeDiff(currentChanges);
   const substantive = getSubstantiveChanges(currentChanges);
+  const originalSignals = new Set(scanDocument(documentA.text).map((clause) => clause.categoryId));
+  const revisedSignals = new Set(scanDocument(documentB.text).map((clause) => clause.categoryId));
+  const addedSignals = [...revisedSignals].filter((signal) => !originalSignals.has(signal));
+  const removedSignals = [...originalSignals].filter((signal) => !revisedSignals.has(signal));
 
-  renderDiffSummary(summary, substantive.length);
+  renderDiffSummary(summary, substantive.length, addedSignals.length, removedSignals.length);
   renderDiffChangeList(substantive);
 
   document.getElementById('diffResultsSection')?.classList.remove('hidden');
@@ -160,17 +165,22 @@ function runComparison() {
  * Renders the summary stat row.
  * @param {{added: number, removed: number, modified: number}} summary
  * @param {number} totalChanges
+ * @param {number} addedSignals
+ * @param {number} removedSignals
  */
-function renderDiffSummary(summary, totalChanges) {
+function renderDiffSummary(summary, totalChanges, addedSignals, removedSignals) {
   const textEl = document.getElementById('diffSummaryText');
   const addedEl = document.getElementById('addedCount');
   const removedEl = document.getElementById('removedCount');
   const modifiedEl = document.getElementById('modifiedCount');
 
   if (textEl) {
+    const signalNote = addedSignals || removedSignals
+      ? ` Risk/inconsistency signals changed: ${addedSignals} added, ${removedSignals} removed.`
+      : '';
     textEl.textContent = totalChanges === 0
       ? 'No substantive paragraph-level differences were found between these two documents.'
-      : `Found ${totalChanges} substantive change${totalChanges === 1 ? '' : 's'} between the two versions.`;
+      : `Found ${totalChanges} substantive change${totalChanges === 1 ? '' : 's'} between the two versions.${signalNote}`;
   }
   if (addedEl) addedEl.textContent = String(summary.added);
   if (removedEl) removedEl.textContent = String(summary.removed);

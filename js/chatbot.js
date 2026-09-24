@@ -55,6 +55,15 @@ const messageTimes = [];
 let isProcessing = false;
 
 /**
+ * Maximum conversation turns retained in history.
+ * Prevents unbounded memory growth and keeps the token payload predictable.
+ */
+const MAX_HISTORY_TURNS = 12;
+
+/** @type {AbortController|null} — cancelled on panel close or new send */
+let currentAbortController = null;
+
+/**
  * Checks the client-side rate limit.
  * @returns {boolean}
  */
@@ -229,13 +238,21 @@ async function sendMessage() {
   setSendButtonState(true);
 
   conversationHistory.push({ role: 'user', content: message });
+
+  // Prune history to MAX_HISTORY_TURNS pairs to bound memory and token usage
+  if (conversationHistory.length > MAX_HISTORY_TURNS * 2) {
+    conversationHistory = conversationHistory.slice(conversationHistory.length - MAX_HISTORY_TURNS * 2);
+  }
+
   const typingId = showTyping();
+  currentAbortController = new AbortController();
 
   try {
     const documentContext = buildDocumentContext();
     const response = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: currentAbortController.signal,
       body: JSON.stringify({
         messages: [
           { role: 'system', content: `${SYSTEM_PROMPT}${documentContext}` },
@@ -258,12 +275,14 @@ async function sendMessage() {
     appendMessage('ai', reply);
     announceToScreenReader('Lexara Assistant responded.');
   } catch (error) {
+    if (error.name === 'AbortError') { removeTyping(typingId); return; }
     removeTyping(typingId);
     appendMessage('ai', `${error.message} Make sure the server is running and try again.`);
     conversationHistory.pop();
     console.error('[Lexara Assistant Error]', error);
   } finally {
     isProcessing = false;
+    currentAbortController = null;
     setSendButtonState(false);
     input.focus();
   }
@@ -272,6 +291,8 @@ async function sendMessage() {
 window.sendMessage = sendMessage;
 
 window.clearChat = function clearChat() {
+  currentAbortController?.abort();
+  currentAbortController = null;
   conversationHistory = [];
   const container = document.getElementById('chatMessages');
   if (!container) return;
@@ -282,3 +303,5 @@ window.clearChat = function clearChat() {
     </div>`;
   announceToScreenReader('Chat cleared.');
 };
+
+window.addEventListener('beforeunload', () => currentAbortController?.abort());
