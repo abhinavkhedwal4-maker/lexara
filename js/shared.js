@@ -278,6 +278,28 @@ export function autoResize(el) {
 }
 if (typeof window !== 'undefined') window.autoResize = autoResize;
 
+/**
+ * Triggers a client-side file download and immediately revokes the
+ * object URL to release the underlying Blob from memory.
+ * Proper resource cleanup prevents memory leaks on repeated exports.
+ *
+ * @param {string} content   - Text content to write to the file
+ * @param {string} filename  - Suggested file name (e.g. 'lexara-export.md')
+ * @param {string} mimeType  - MIME type (e.g. 'text/markdown', 'application/json')
+ */
+export function triggerFileDownload(content, filename, mimeType) {
+  const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  // Release the object URL immediately — prevents memory leaks on repeated exports
+  URL.revokeObjectURL(url);
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // AUTH BOOTSTRAP
 // Imported lazily so pages without Firebase never block on network requests.

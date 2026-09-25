@@ -34,6 +34,14 @@ wireGlobalActions();
 /** @type {import('./clause-patterns.js').FlaggedClause[]} */
 let currentFlaggedClauses = [];
 
+/**
+ * AbortController for any in-flight AI explain request.
+ * Cancelled automatically when the same button is toggled closed or a new
+ * request is started, preventing dangling fetch promises.
+ * @type {AbortController|null}
+ */
+let explainAbortController = null;
+
 // ─── Restore a document already loaded on another page ───────────────────────
 
 const existingDoc = getActiveDocument();
@@ -298,6 +306,7 @@ function highlightMatch(context, matchedText) {
 
 /**
  * Fetches an AI-generated deeper explanation for a specific flagged clause.
+ * Cancels any previously in-flight request before starting a new one.
  * @param {HTMLButtonElement} btn
  * @returns {Promise<void>}
  */
@@ -309,10 +318,22 @@ async function handleExplainClick(btn) {
 
   const isOpen = !explainEl.classList.contains('hidden');
   if (isOpen) {
+    // Cancel any in-flight request for this panel before hiding
+    if (explainAbortController) {
+      explainAbortController.abort();
+      explainAbortController = null;
+    }
     explainEl.classList.add('hidden');
     btn.setAttribute('aria-expanded', 'false');
     return;
   }
+
+  // Cancel any previously in-flight explain request before starting a new one
+  if (explainAbortController) {
+    explainAbortController.abort();
+  }
+  explainAbortController = new AbortController();
+  const { signal } = explainAbortController;
 
   explainEl.classList.remove('hidden');
   btn.setAttribute('aria-expanded', 'true');
@@ -356,6 +377,7 @@ Do not tell the user what decision to make. Stay grounded in the document text p
           { role: 'user', content: prompt },
         ],
       }),
+      signal,
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const { reply } = await res.json();
@@ -367,6 +389,7 @@ Do not tell the user what decision to make. Stay grounded in the document text p
       .replace(/\n\n/g, '<br><br>')
       .replace(/\n/g, '<br>');
   } catch (err) {
+    if (err.name === 'AbortError') return; // Request was intentionally cancelled
     console.error('[RiskScanner] AI explain error:', err.message);
     explainEl.innerHTML = '<p class="panel-error-msg">⚠️ Could not load explanation. Try the chat assistant instead.</p>';
   }

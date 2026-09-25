@@ -55,6 +55,15 @@ const messageTimes = [];
 let isProcessing = false;
 
 /**
+ * Maximum conversation turns kept in history (user + assistant = 2 entries per turn).
+ * Prevents unbounded memory growth and keeps the API payload predictable.
+ */
+const MAX_HISTORY_TURNS = 12;
+
+/** @type {AbortController|null} Cancelled when a new message is sent */
+let currentAbortController = null;
+
+/**
  * Checks the client-side rate limit.
  * @returns {boolean}
  */
@@ -229,13 +238,21 @@ async function sendMessage() {
   setSendButtonState(true);
 
   conversationHistory.push({ role: 'user', content: message });
+
+  // Prune to MAX_HISTORY_TURNS pairs — bounds memory and keeps token usage predictable
+  if (conversationHistory.length > MAX_HISTORY_TURNS * 2) {
+    conversationHistory = conversationHistory.slice(conversationHistory.length - MAX_HISTORY_TURNS * 2);
+  }
+
   const typingId = showTyping();
+  currentAbortController = new AbortController();
 
   try {
     const documentContext = buildDocumentContext();
     const response = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: currentAbortController.signal,
       body: JSON.stringify({
         messages: [
           { role: 'system', content: `${SYSTEM_PROMPT}${documentContext}` },
@@ -258,12 +275,14 @@ async function sendMessage() {
     appendMessage('ai', reply);
     announceToScreenReader('Lexara Assistant responded.');
   } catch (error) {
+    if (error.name === 'AbortError') { removeTyping(typingId); return; }
     removeTyping(typingId);
     appendMessage('ai', `${error.message} Make sure the server is running and try again.`);
     conversationHistory.pop();
     console.error('[Lexara Assistant Error]', error);
   } finally {
     isProcessing = false;
+    currentAbortController = null;
     setSendButtonState(false);
     input.focus();
   }

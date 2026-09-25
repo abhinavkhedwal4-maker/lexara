@@ -183,13 +183,27 @@ export function getTermByClauseId(clauseId) {
 }
 
 /**
+ * Memoised search cache — avoids recomputing the same query on repeated calls
+ * (e.g. debounced keystrokes that land on the same normalised string).
+ * Cleared automatically when the module is first evaluated; size is bounded
+ * by the finite vocabulary of search queries a user can type.
+ * @type {Map<string, GlossaryTerm[]>}
+ */
+const _searchCache = new Map();
+
+/**
  * Filters glossary terms by a search query matching term name or meaning.
+ * Results are memoised — identical queries return the cached array without
+ * re-scanning the dataset.
  * @param {string} query
  * @returns {GlossaryTerm[]}
  */
 export function searchGlossary(query) {
   if (!query || !query.trim()) return [...GLOSSARY_TERMS];
   const q = query.trim().toLowerCase();
-  return GLOSSARY_TERMS.filter((t) =>
+  if (_searchCache.has(q)) return _searchCache.get(q);
+  const result = GLOSSARY_TERMS.filter((t) =>
     t.term.toLowerCase().includes(q) || t.plainMeaning.toLowerCase().includes(q));
+  _searchCache.set(q, result);
+  return result;
 }

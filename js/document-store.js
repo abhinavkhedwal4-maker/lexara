@@ -81,8 +81,14 @@ export function clearActiveDocument() {
 
 /**
  * Returns true if a document is currently loaded.
+ * Uses a lightweight sessionStorage key-existence check instead of
+ * a full JSON.parse round-trip, keeping this hot-path O(1).
  * @returns {boolean}
  */
 export function hasActiveDocument() {
-  return getActiveDocument() !== null;
+  try {
+    return sessionStorage.getItem(STORAGE_KEY) !== null;
+  } catch {
+    return false;
+  }
 }

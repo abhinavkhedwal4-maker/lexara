@@ -30,6 +30,14 @@ let documentB = null;
 /** @type {import('./document-diff.js').DiffChange[]} */
 let currentChanges = [];
 
+/**
+ * AbortController for any in-flight AI change-explanation request.
+ * Cancelled automatically when the same panel is toggled closed or a new
+ * request supersedes it, preventing dangling fetch promises.
+ * @type {AbortController|null}
+ */
+let explainAbortController = null;
+
 // ─── Upload wiring for both slots ──────────────────────────────────────────────
 
 wireUploadSlot('A');
@@ -216,6 +224,7 @@ function renderChangeText(change) {
 
 /**
  * Fetches an AI explanation of why a specific change might matter.
+ * Cancels any previously in-flight request before starting a new one.
  * @param {HTMLButtonElement} btn
  * @param {import('./document-diff.js').DiffChange[]} changes
  * @returns {Promise<void>}
@@ -227,7 +236,23 @@ async function handleExplainChange(btn, changes) {
   if (!change || !noteEl) return;
 
   const isOpen = !noteEl.classList.contains('hidden');
-  if (isOpen) { noteEl.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false'); return; }
+  if (isOpen) {
+    // Cancel any in-flight request before hiding the panel
+    if (explainAbortController) {
+      explainAbortController.abort();
+      explainAbortController = null;
+    }
+    noteEl.classList.add('hidden');
+    btn.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  // Cancel any previously in-flight explain request before starting a new one
+  if (explainAbortController) {
+    explainAbortController.abort();
+  }
+  explainAbortController = new AbortController();
+  const { signal } = explainAbortController;
 
   noteEl.classList.remove('hidden');
   btn.setAttribute('aria-expanded', 'true');
@@ -270,6 +295,7 @@ Do not give a recommendation on what to do. Stay grounded in the text.`;
           { role: 'user', content: prompt },
         ],
       }),
+      signal,
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const { reply } = await res.json();
@@ -278,6 +304,7 @@ Do not give a recommendation on what to do. Stay grounded in the text.`;
       .replace(/\n\n/g, '<br><br>')
       .replace(/\n/g, '<br>');
   } catch (err) {
+    if (err.name === 'AbortError') return; // Request was intentionally cancelled
     console.error('[Comparator] AI explain error:', err.message);
     noteEl.textContent = '⚠️ Could not load explanation.';
   }

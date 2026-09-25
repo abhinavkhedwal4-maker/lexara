@@ -12,7 +12,7 @@
 
 'use strict';
 
-import { renderNavbar, renderChatPanel, wireGlobalActions, sanitizeString } from './shared.js';
+import { renderNavbar, renderChatPanel, wireGlobalActions, sanitizeString, triggerFileDownload } from './shared.js';
 import { parseDocument, formatFileSize } from './pdf-parser.js';
 import { setActiveDocument, getActiveDocument, clearActiveDocument } from './document-store.js';
 import { scanDocument, computeDocumentRiskScore, summarizeByCategory } from './clause-patterns.js';
@@ -328,3 +328,53 @@ Generate exactly 8 specific, numbered questions this person should ask their law
 // ─── Print / export ────────────────────────────────────────────────────────────
 
 document.getElementById('printPrepBtn')?.addEventListener('click', () => window.print());
+
+/**
+ * Exports the generated prep sheet as a date-stamped Markdown file.
+ * Uses triggerFileDownload which releases the Blob URL immediately after
+ * download to avoid memory leaks on repeated exports.
+ */
+document.getElementById('exportMdBtn')?.addEventListener('click', () => {
+  const fileName = document.getElementById('previewFileName')?.textContent || 'document';
+  const priorityBadge = document.getElementById('priorityBadge')?.textContent || '';
+  const introText = document.getElementById('prepIntroText')?.textContent || '';
+
+  // Collect checklist items
+  const checklistItems = [...document.querySelectorAll('.prep-checklist-item span')]
+    .map((el) => `- [ ] ${el.textContent.trim()}`)
+    .join('\n');
+
+  // Collect AI questions
+  const questionItems = [...document.querySelectorAll('.prep-question-card span:last-child')]
+    .map((el, i) => `${i + 1}. ${el.textContent.trim()}`)
+    .join('\n');
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  const markdown = [
+    `# ⚖️ Lexara — Lawyer Prep Sheet`,
+    `**Document**: ${fileName}`,
+    `**Generated**: ${new Date().toLocaleString()}`,
+    `**Review Priority**: ${priorityBadge}`,
+    '',
+    `> ${introText}`,
+    '',
+    '---',
+    '',
+    '## ✅ Pre-Meeting Checklist',
+    '',
+    checklistItems || '*(No checklist items generated)*',
+    '',
+    '---',
+    '',
+    '## 💬 Questions to Ask Your Attorney',
+    '',
+    questionItems || '*(No questions generated — generate a prep sheet first)*',
+    '',
+    '---',
+    '',
+    '*Lexara provides information and assistance, not legal advice.*',
+    '*Consult a licensed attorney for decisions affecting your legal rights.*',
+  ].join('\n');
+
+  triggerFileDownload(markdown, `lexara-prep-sheet-${dateStr}.md`, 'text/markdown');
+});

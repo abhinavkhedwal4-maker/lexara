@@ -1,0 +1,59 @@
+{
+  "name": "Lexara — AI for Legal Access & Assistance",
+  "description": "A GenAI-powered platform that makes legal information accessible by simplifying complex legal documents, comparing contracts and policies, highlighting important clauses and risks, answering questions from provided documents, generating actionable summaries and checklists, and helping users prepare questions for a legal professional. Provides information and assistance, never a substitute for professional legal advice.",
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"],
+  "problemStatement": "AI for Legal Assistance & Access",
+  "useCases": [
+    "Simplifying complex legal documents into plain language at multiple reading levels",
+    "Comparing contracts, agreements, or policies with deterministic paragraph-level diff",
+    "Highlighting important clauses, obligations, risks, and inconsistencies across 16 risk categories",
+    "Answering questions based on provided legal documents with grounded citations",
+    "Helping users understand their options and potential next steps",
+    "Generating summaries, checklists, and actionable outputs via the Lawyer Prep Sheet",
+    "Helping users prepare specific questions for a legal professional"
+  ],
+  "architecture": {
+    "frontend": "Vanilla JavaScript ES Modules, HTML5, CSS3",
+    "backend": "Node.js Express serverless function (Vercel)",
+    "ai": "Groq API — LLaMA 3.3 70B Versatile with 3-model fallback ladder",
+    "auth": "Firebase Authentication — Google Sign-In (opt-in only)",
+    "storage": "sessionStorage (default) + Firestore (opt-in save)"
+  },
+  "aiUsage": [
+    {
+      "feature": "Document Simplifier",
+      "endpoint": "/api/chat",
+      "description": "Rewrites complex legal documents in plain language at user-selected reading level with KEY POINTS summary"
+    },
+    {
+      "feature": "Risk Scanner — Explain Clause",
+      "endpoint": "/api/chat",
+      "description": "Explains flagged clauses in plain language, grounded in exact document text"
+    },
+    {
+      "feature": "Document Comparator — Explain Change",
+      "endpoint": "/api/chat",
+      "description": "Explains practical significance of deterministically detected document changes"
+    },
+    {
+      "feature": "Ask My Document",
+      "endpoint": "/api/chat",
+      "description": "Answers questions strictly from loaded document text with citations"
+    },
+    {
+      "feature": "Lawyer Prep Sheet",
+      "endpoint": "/api/chat",
+      "description": "Generates 8 document-specific questions for attorney consultation grounded in flagged clause language"
+    }
+  ],
+  "security": [
+    "Client-side PDF parsing — raw files never transmitted to server",
+    "Prompt injection filtering — 6 patterns applied client-side and server-side",
+    "Two-tier rate limiting — 100 req/min general, 20 req/min AI endpoints",
+    "Full security header set including strict CSP with no unsafe-inline scripts",
+    "API key server-side only — never exposed to client bundle",
+    "Input validation and XSS sanitization on all AI output"
+  ],
+  "accessibility": "WCAG 2.1 AA — skip links, ARIA landmarks, keyboard navigation, prefers-reduced-motion, 4.5:1 contrast ratios, 3 reading-level options",
+  "testing": "63 zero-dependency tests covering clause detection, document diffing, server validation, rate limiter, injection patterns, model ladder logic"
+}
